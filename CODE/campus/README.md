@@ -4,46 +4,31 @@ A robust, full-stack Venue Management System and RESTful API tailored specifical
 
 ---
 
-## 🏛️ System Overview
+## System Overview
 
 The system allows Sol Plaatje University administrators, academic staff (Lecturers), and Student Leaders (SRC, Peer Mentors, Tutors, House Committee, etc.) to browse, book, manage, and verify availability of **62+ campus venues across 7 buildings** with automated conflict detection, strict role-based access control (RBAC), and university branding.
 
-### 🎨 SPU Brand Identity
-- **Primary Color:** `#003399` (SPU Cobalt Blue)
-- **Secondary Color:** `#FFD700` (SPU Gold)
-- **Accent & Neutral:** `#FFFFFF` (White), `#000000` (Black text), `#F8F9FA` (Soft background)
-- **Typography:** Outfit & Plus Jakarta Sans
-
 ---
 
-## 📋 Feature Highlights
+## Feature Highlights
 
 1. **Role-Based Authentication & Permissions**
    - **Admin:** Full CRUD access to venues, buildings, user management, and booking approval/decline. Direct Django admin links removed from frontend menus for clean UX.
    - **Lecturers & Student Leaders:** Browse venues, view real-time availability, submit booking requests, cancel their own pending/approved bookings, and track status.
    - **Password Confirmation & Reset:** Mandatory password confirmation on signup, prevention of public admin registration, and forgot/reset password token workflows.
 
-2. **Accurate SPU Venues Database (62+ Venues across 7 Buildings)**
-   - **WP Building:** WP1–WP5 (Geo Lab), WP Computer Labs 1 & 2.
-   - **BA Building:** BA01–BA03 (Small Auditoriums).
-   - **C Block:** C001–C015, C-Lab 1 & 2.
-   - **T Block:** T001–T014, Multipurpose Hall, T-Boardroom.
-   - **N Block (Natural Sciences):** N001–N008, Physics Lab, Chemistry Lab, Biology Lab.
-   - **Humanities Building:** HUM-A1–HUM-A4, HUM-B1–HUM-B4, HUM-Seminar 1–3.
-   - **Main Auditorium Complex:** Auditorium 1 (001), Auditorium 2 (002), Large Exam Hall, Boardroom A & B, Meeting Rooms 1–13.
-
-3. **Intelligent Scheduling & Conflict Prevention**
+2. **Intelligent Scheduling & Conflict Prevention**
    - Operating hours enforcement (08:00 – 17:00).
    - Database-level overlap conflict detection preventing double-booking of any venue for approved slots.
    - Live availability API endpoint calculating free time slots on any chosen date.
 
-4. **Comprehensive RESTful API**
+3. **Comprehensive RESTful API**
    - Complete JSON REST API powered by Django REST Framework & SimpleJWT.
    - Standard HTTP response codes (`200 OK`, `201 Created`, `400 Bad Request`, `401 Unauthorized`, `403 Forbidden`, `404 Not Found`, `409 Conflict`, `422 Unprocessable Entity`).
 
 ---
 
-## 🚀 Quickstart & Setup Guide
+## Quickstart & Setup Guide
 
 ### 1. Prerequisites
 - Python 3.10+ (tested on Python 3.13)
@@ -82,19 +67,19 @@ Navigate to `http://127.0.0.1:8000/` in your web browser.
 
 ---
 
-## 🔑 Default User Accounts
+## Default User Accounts
 
 | Role | Email | Password | Permissions |
 | :--- | :--- | :--- | :--- |
 | **Administrator** | `admin@spu.ac.za` | `AdminPass123!` | Full access, venue CRUD, approval queue, user management |
-| **Lecturer** | `lecturer@spu.ac.za` | `Lecturer123!` | Browse venues, request bookings, cancel own bookings |
-| **Student Leader** | `leader@spu.ac.za` | `Student123!` | Browse venues, request bookings, leadership badge |
+| **Lecturer** | `batlang@spu.ac.za` | `batlang@spu.ac.za012` | Browse venues, request bookings, cancel own bookings |
+| **Student Leader** | `walaza@spu.ac.za` | `walaza@spu.ac.za123` | Browse venues, request bookings, leadership badge |
 
 ---
 
-## 📡 REST API Reference
+## REST API Reference
 
-### 🔐 Authentication Endpoints (`/api/auth/`)
+### Authentication Endpoints (`/api/auth/`)
 
 | Method | Endpoint | Description | Auth Required |
 | :--- | :--- | :--- | :--- |
@@ -131,7 +116,7 @@ curl -X POST http://127.0.0.1:8000/api/auth/login \
 
 ---
 
-### 🏛️ Venues & Buildings Endpoints (`/api/resources/`)
+### Venues & Buildings Endpoints (`/api/resources/`)
 
 | Method | Endpoint | Description | Auth Required |
 | :--- | :--- | :--- | :--- |
@@ -150,7 +135,7 @@ curl -X GET "http://127.0.0.1:8000/api/resources/venues/1/availability?date=2026
 
 ---
 
-### 📅 Bookings Endpoints (`/api/resources/bookings`)
+### Bookings Endpoints (`/api/resources/bookings`)
 
 | Method | Endpoint | Description | Auth Required |
 | :--- | :--- | :--- | :--- |
@@ -177,7 +162,7 @@ curl -X POST http://127.0.0.1:8000/api/resources/bookings \
 
 ---
 
-## 🧪 Automated Unit Testing
+## Automated Unit Testing
 
 To run the automated test suite covering all authentication workflows, venue filtering, role enforcement, booking conflict prevention, and availability calculation:
 
@@ -200,7 +185,7 @@ python manage.py test
 
 ---
 
-## 📁 Project Architecture
+## Project Architecture
 
 ```
 campus/
