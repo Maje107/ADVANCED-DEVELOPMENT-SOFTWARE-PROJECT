@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}{% if mode == 'create' %}Add SPU Venue{% else %}Edit SPU Venue{% endif %} | Sol Plaatje University{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{% url 'dashboard:resources' %}" class="text-decoration-none d-inline-flex align-items-center mb-3 fw-semibold" style="color: var(--spu-navy);">
+        <i class="bi bi-arrow-left me-2" style="color: var(--spu-red);"></i> Back to Venues Inventory
+    </a>
+    <h1 class="fw-bold mb-1" style="color: var(--spu-navy);">
+        {% if mode == 'create' %}
+            <i class="bi bi-plus-circle me-2" style="color: var(--spu-red);"></i>Add New SPU Venue
+        {% else %}
+            <i class="bi bi-pencil-square me-2" style="color: var(--spu-red);"></i>Edit Venue: {{ resource.name }}
+        {% endif %}
+    </h1>
+    <p class="text-muted mb-0" style="color: var(--spu-text-muted) !important;">Fill in the venue specifications, capacity, and building assignment.</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="card spu-card overflow-hidden border-0">
+            <div class="spu-brand-ribbon"></div>
+            <div class="card-body p-4 p-md-5" style="background: var(--spu-card-bg);">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold small" style="color: var(--spu-navy);">Venue Name <span class="text-danger">*</span></label>
+                            <input type="text" name="name" class="form-control form-control-lg rounded-3" placeholder="e.g. WP5 (Geo Lab) / Auditorium 1 (001)"
+                                value="{% if mode == 'edit' %}{{ resource.name }}{% endif %}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small" style="color: var(--spu-navy);">Venue Type <span class="text-danger">*</span></label>
+                            <select name="venue_type" class="form-select form-select-lg rounded-3" required>
+                                {% for val, label in type_choices %}
+                                <option value="{{ val }}" {% if mode == 'edit' and resource.venue_type == val %}selected{% endif %}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small" style="color: var(--spu-navy);">SPU Building <span class="text-danger">*</span></label>
+                            <select name="building" class="form-select rounded-3 py-2" required>
+                                <option value="">-- Select SPU Building --</option>
+                                {% for b in buildings %}
+                                <option value="{{ b.id }}" {% if mode == 'edit' and resource.building_id == b.id %}selected{% endif %}>{{ b.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold small" style="color: var(--spu-navy);">Room Number</label>
+                            <input type="text" name="room_number" class="form-control rounded-3 py-2" placeholder="e.g. WP5, C015, HUM-A1"
+                                value="{% if mode == 'edit' %}{{ resource.room_number|default:'' }}{% endif %}">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold small" style="color: var(--spu-navy);">Seating Capacity</label>
+                            <input type="number" name="capacity" min="1" class="form-control rounded-3 py-2" placeholder="e.g. 80"
+                                value="{% if mode == 'edit' %}{{ resource.capacity|default:'' }}{% endif %}">
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small" style="color: var(--spu-navy);">Opening Time</label>
+                            <input type="time" name="opening_time" class="form-control rounded-3 py-2"
+                                value="{% if mode == 'edit' %}{{ resource.opening_time|time:'H:i' }}{% else %}07:30{% endif %}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small" style="color: var(--spu-navy);">Closing Time</label>
+                            <input type="time" name="closing_time" class="form-control rounded-3 py-2"
+                                value="{% if mode == 'edit' %}{{ resource.closing_time|time:'H:i' }}{% else %}21:00{% endif %}">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold small" style="color: var(--spu-navy);">Description & Special Equipment</label>
+                        <textarea name="description" class="form-control rounded-3" rows="3"
+                            placeholder="e.g. Equipped with 4K projector, HDMI hookups, smart podium, wheelchair access...">{% if mode == 'edit' %}{{ resource.description }}{% endif %}</textarea>
+                    </div>
+
+                    <div class="d-flex gap-3 justify-content-end pt-3 border-top" style="border-color: var(--spu-border) !important;">
+                        <a href="{% url 'dashboard:resources' %}" class="btn btn-light border rounded-3 px-4" style="border-color: var(--spu-border) !important; color: var(--spu-navy);">Cancel</a>
+                        <button type="submit" class="btn btn-spu-primary rounded-3 px-5 fw-semibold shadow-sm">
+                            <i class="bi bi-check2-circle me-1"></i>
+                            {% if mode == 'create' %}Save SPU Venue{% else %}Update Venue Details{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

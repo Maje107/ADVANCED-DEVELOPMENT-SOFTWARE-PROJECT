@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Booking Requests | Sol Plaatje University{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+        <h1 class="fw-bold mb-1" style="color: var(--spu-navy);">
+            <i class="bi bi-clipboard2-check me-2" style="color: var(--spu-red);"></i>Venue Booking Requests
+        </h1>
+        <p class="text-muted mb-0" style="color: var(--spu-text-muted) !important;">Review, approve, or decline reservation requests submitted by Lecturers and Student Leaders.</p>
+    </div>
+</div>
+
+<!-- Search & Filter Card -->
+<div class="card spu-card mb-4 border-0">
+    <div class="card-body p-4">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-md-6">
+                <label class="form-label small fw-semibold" style="color: var(--spu-navy);">Lookup Booking</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0" style="border-color: var(--spu-border); color: var(--spu-navy);"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search by Booking ID (e.g. 5) or requestor/venue..." value="{{ search_query|default:'' }}">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small fw-semibold" style="color: var(--spu-navy);">Filter Status</label>
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending Review</option>
+                    <option value="approved" {% if status_filter == 'approved' %}selected{% endif %}>Approved</option>
+                    <option value="declined" {% if status_filter == 'declined' %}selected{% endif %}>Declined</option>
+                    <option value="cancelled" {% if status_filter == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-spu-primary rounded-3 w-100"><i class="bi bi-funnel me-1"></i> Filter</button>
+                    <a href="{% url 'dashboard:booking_requests' %}" class="btn btn-light border rounded-3" style="border-color: var(--spu-border) !important; color: var(--spu-navy);"><i class="bi bi-arrow-counterclockwise"></i></a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card spu-card overflow-hidden border-0">
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead class="bg-light" style="background-color: var(--spu-bg) !important;">
+                <tr>
+                    <th class="py-3 px-4" style="color: var(--spu-navy);">ID & Ref</th>
+                    <th class="py-3" style="color: var(--spu-navy);">Venue</th>
+                    <th class="py-3" style="color: var(--spu-navy);">Requested By</th>
+                    <th class="py-3" style="color: var(--spu-navy);">Date & Time</th>
+                    <th class="py-3" style="color: var(--spu-navy);">Purpose</th>
+                    <th class="py-3" style="color: var(--spu-navy);">Status</th>
+                    <th class="py-3 text-end px-4" style="color: var(--spu-navy);">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td class="px-4">
+                        <a href="{% url 'dashboard:booking_detail' booking.id %}" class="fw-bold text-decoration-none" style="color: var(--spu-red);">
+                            #{{ booking.id }}
+                        </a>
+                        <small class="text-muted d-block">SPU-BK-{{ booking.id }}</small>
+                    </td>
+                    <td>
+                        <div class="fw-bold" style="color: var(--spu-navy);">{{ booking.resource.name }}</div>
+                        <small class="text-muted">{{ booking.resource.building.name|default:'Campus' }} &bull; Room {{ booking.resource.room_number|default:'—' }}</small>
+                    </td>
+                    <td>
+                        <div class="fw-semibold" style="color: var(--spu-navy);">{{ booking.requested_by.full_name }}</div>
+                        <small class="text-muted">{{ booking.requested_by.email }}</small><br>
+                        <span class="badge {% if booking.requested_by.role == 'lecturer' %}badge-role-lecturer{% else %}badge-role-student{% endif %} rounded-pill px-2 py-0" style="font-size:0.7rem;">
+                            {{ booking.requested_by.get_role_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="fw-semibold" style="color: var(--spu-navy);">{{ booking.booking_date|date:"l, d M Y" }}</div>
+                        <small class="text-muted"><i class="bi bi-clock me-1"></i>{{ booking.start_time|time:"H:i" }} – {{ booking.end_time|time:"H:i" }}</small>
+                    </td>
+                    <td>
+                        <span class="small" style="color: var(--spu-text-body);">{{ booking.purpose|truncatechars:40 }}</span><br>
+                        <small class="text-muted"><i class="bi bi-telephone me-1"></i>{{ booking.phone_number }}</small>
+                    </td>
+                    <td>
+                        {% if booking.status == 'approved' %}
+                            <span class="badge rounded-pill px-3 py-2" style="background: var(--spu-navy-subtle); color: var(--spu-navy); border: 1px solid var(--spu-navy);"><i class="bi bi-check-circle-fill me-1"></i> Approved</span>
+                        {% elif booking.status == 'declined' %}
+                            <span class="badge rounded-pill px-3 py-2" style="background: var(--spu-red-subtle); color: var(--spu-red); border: 1px solid var(--spu-red);"><i class="bi bi-x-circle-fill me-1"></i> Declined</span>
+                        {% elif booking.status == 'cancelled' %}
+                            <span class="badge rounded-pill px-3 py-2 bg-light text-muted border"><i class="bi bi-slash-circle me-1"></i> Cancelled</span>
+                        {% else %}
+                            <span class="badge rounded-pill px-3 py-2" style="background: var(--spu-orange-subtle); color: var(--spu-orange-hover); border: 1px solid var(--spu-orange);"><i class="bi bi-hourglass-split me-1"></i> Pending Review</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-end px-4">
+                        <div class="d-flex justify-content-end align-items-center gap-2">
+                            <a href="{% url 'dashboard:booking_detail' booking.id %}" class="btn btn-sm btn-light border rounded-2 px-2" style="border-color: var(--spu-border) !important; color: var(--spu-navy);" title="View Full Details">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            {% if booking.status == 'pending' %}
+                            <form method="post" action="{% url 'dashboard:booking_update_status' booking.id %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-spu-primary rounded-2 px-2 fw-semibold" name="status" value="approved" title="Approve">
+                                    <i class="bi bi-check-lg"></i>
+                                </button>
+                                <button type="submit" class="btn btn-sm btn-outline-danger rounded-2 px-2 fw-semibold" name="status" value="declined" title="Decline">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-5 text-muted">
+                        <i class="bi bi-inbox display-4 d-block mb-3 opacity-50" style="color: var(--spu-red);"></i>
+                        <h5 class="fw-bold" style="color: var(--spu-navy);">No Booking Requests Found</h5>
+                        <p class="small text-muted">No booking requests matching your search criteria.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+
+

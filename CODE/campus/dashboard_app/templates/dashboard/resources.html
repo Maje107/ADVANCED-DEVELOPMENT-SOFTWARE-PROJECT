@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}SPU Venues Inventory | Sol Plaatje University{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+        <h1 class="fw-bold mb-1" style="color: var(--spu-navy);">Sol Plaatje University Venues</h1>
+        <p class="text-muted mb-0" style="color: var(--spu-text-muted) !important;">Browse and book lecture halls, classrooms, science laboratories, and auditoriums.</p>
+    </div>
+    {% if user.role == 'admin' %}
+    <a href="{% url 'dashboard:resources_create' %}" class="btn btn-spu-primary rounded-3 px-4 py-2">
+        <i class="bi bi-plus-circle me-1"></i> Add New SPU Venue
+    </a>
+    {% endif %}
+</div>
+
+<!-- Search & Filters Card -->
+<div class="card spu-card mb-4 border-0">
+    <div class="card-body p-4">
+        <form method="GET" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label small fw-semibold" style="color: var(--spu-navy);">Search Venue</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0" style="border-color: var(--spu-border); color: var(--spu-navy);"><i class="bi bi-search"></i></span>
+                    <input type="text" name="search" class="form-control border-start-0" placeholder="Venue name, room code, description..." value="{{ search|default:'' }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold" style="color: var(--spu-navy);">Filter by Building</label>
+                <select name="building" class="form-select">
+                    <option value="">All Buildings (7)</option>
+                    {% for b in buildings %}
+                    <option value="{{ b.id }}" {% if selected_building == b.id|stringformat:"s" %}selected{% endif %}>{{ b.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-semibold" style="color: var(--spu-navy);">Filter by Type</label>
+                <select name="type" class="form-select">
+                    <option value="">All Venue Types</option>
+                    {% for val, label in type_choices %}
+                    <option value="{{ val }}" {% if type_filter == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-spu-primary rounded-3 w-100"><i class="bi bi-funnel me-1"></i> Filter</button>
+                    <a href="{% url 'dashboard:resources' %}" class="btn btn-light border rounded-3" style="border-color: var(--spu-border) !important; color: var(--spu-navy);" title="Clear Filters"><i class="bi bi-arrow-counterclockwise"></i></a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if resources %}
+<div class="row g-4">
+    {% for r in resources %}
+    <div class="col-lg-4 col-md-6">
+        <div class="card spu-card h-100 overflow-hidden d-flex flex-column">
+            <!-- Card Header with SPU Theme (Red to Navy Gradient) -->
+            <div class="p-4 text-white position-relative" style="background: linear-gradient(135deg, var(--spu-red) 0%, var(--spu-navy-dark) 100%);">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div class="rounded-3 d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width:48px;height:48px;background: var(--spu-orange); color: var(--spu-navy-dark); font-size:1.3rem;">
+                        <i class="bi bi-{% if r.venue_type == 'Laboratory' or r.venue_type == 'Computer Lab' %}cpu{% elif r.venue_type == 'Auditorium' %}film{% elif r.venue_type == 'Lecture Hall' %}easel{% else %}mortarboard{% endif %}"></i>
+                    </div>
+                    <span class="badge rounded-pill px-3 py-1 fw-bold" style="background: rgba(255,255,255,0.2); color: #FFFFFF; border: 1px solid rgba(255,255,255,0.3);">
+                        {{ r.venue_type }}
+                    </span>
+                </div>
+                <h4 class="fw-bold mb-1 text-white" style="letter-spacing: -0.3px;">{{ r.name }}</h4>
+                <div class="small opacity-90 d-flex align-items-center gap-1" style="color: var(--spu-orange) !important;">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    <span>{{ r.building.name|default:'SPU Campus' }} &bull; Room {{ r.room_number|default:'—' }}</span>
+                </div>
+            </div>
+
+            <!-- Card Body -->
+            <div class="card-body p-4 d-flex flex-column justify-content-between" style="background: var(--spu-card-bg);">
+                <div>
+                    <div class="row g-2 mb-3 small">
+                        <div class="col-6">
+                            <div class="rounded-3 p-2 text-center border" style="background: #FFFFFF; border-color: var(--spu-border) !important;">
+                                <span class="text-muted d-block" style="font-size:0.75rem;"><i class="bi bi-people me-1" style="color: var(--spu-red);"></i>Capacity</span>
+                                <strong class="fs-6" style="color: var(--spu-navy);">{{ r.capacity|default:'—' }} seats</strong>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="rounded-3 p-2 text-center border" style="background: #FFFFFF; border-color: var(--spu-border) !important;">
+                                <span class="text-muted d-block" style="font-size:0.75rem;"><i class="bi bi-clock me-1" style="color: var(--spu-orange);"></i>Hours</span>
+                                <strong class="fs-6" style="color: var(--spu-navy);">{{ r.opening_time|time:"H:i" }} - {{ r.closing_time|time:"H:i" }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if r.description %}
+                    <p class="small mb-4" style="color: var(--spu-text-muted);">{{ r.description }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="pt-3 border-top d-flex gap-2">
+                    {% if user.role == 'admin' %}
+                    <a href="{% url 'dashboard:resources_edit' r.id %}" class="btn btn-sm btn-outline-secondary rounded-3 px-3 py-2 flex-grow-1" style="border-color: var(--spu-border); color: var(--spu-navy);">
+                        <i class="bi bi-pencil me-1"></i> Edit Venue
+                    </a>
+                    <a href="{% url 'dashboard:resources_delete' r.id %}" class="btn btn-sm btn-outline-danger rounded-3 px-3 py-2" onclick="return confirm('Delete this venue?');">
+                        <i class="bi bi-trash"></i>
+                    </a>
+                    {% else %}
+                    <a href="{% url 'dashboard:booking_create' r.id %}" class="btn btn-spu-primary rounded-3 w-100 py-2 fw-semibold">
+                        <i class="bi bi-calendar-plus me-1"></i> Request Reservation
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card spu-card text-center p-5 border-0">
+    <i class="bi bi-buildings display-3 d-block mb-3 opacity-50" style="color: var(--spu-red);"></i>
+    <h4 class="fw-bold" style="color: var(--spu-navy);">No SPU Venues Found</h4>
+    <p class="text-muted mb-4" style="color: var(--spu-text-muted) !important;">Try adjusting your building, type, or search keyword filter criteria.</p>
+    <div>
+        <a href="{% url 'dashboard:resources' %}" class="btn btn-spu-primary rounded-3 px-4">Reset Search Filters</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

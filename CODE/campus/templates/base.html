@@ -1,0 +1,416 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sol Plaatje University - Venue Management System{% endblock %}</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Sol Plaatje University Brand Guidelines (Strictly No Black) */
+            --spu-red: #C8102E;            /* Primary / Dominant */
+            --spu-red-hover: #A60D26;      /* Primary Hover / Darker red */
+            --spu-red-light: #E02444;      /* Lighter red accent */
+            --spu-red-subtle: #FDE8EC;     /* Light red tint for badges/selection */
+            
+            --spu-navy: #0A2472;           /* Secondary / Text headers / Secondary Buttons */
+            --spu-navy-dark: #071B54;      /* Deep Navy */
+            --spu-navy-light: #183C9E;     /* Medium Navy */
+            --spu-navy-subtle: #E8EDFB;    /* Subtle Navy background tint */
+            
+            --spu-orange: #F5A623;         /* Accent / Highlights / Amber */
+            --spu-orange-hover: #D98E16;   /* Orange hover */
+            --spu-orange-subtle: #FEF6E9;  /* Orange subtle tint */
+            
+            --spu-bg: #F5F0E6;             /* Beige Neutral background */
+            --spu-card-bg: #FAF7F2;        /* Warm Beige Card background */
+            --spu-surface: #FFFFFF;        /* Clean elevated surface */
+            --spu-border: #E5DEC9;         /* Warm Beige/Sand border */
+            
+            --spu-text-main: #0A2472;      /* Navy Blue for primary text (No Black) */
+            --spu-text-body: #1E3163;      /* Deep Navy for readable body text */
+            --spu-text-muted: #5C6E96;     /* Slate Navy for secondary/muted text */
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--spu-bg);
+            color: var(--spu-text-body);
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4, h5, h6, .navbar-brand, .font-heading {
+            font-family: 'Outfit', sans-serif;
+            color: var(--spu-navy);
+            letter-spacing: -0.02em;
+        }
+
+        /* Top Accent Bar: Red as Dominant strip, with Navy and Orange secondary bands */
+        .spu-brand-ribbon {
+            height: 6px;
+            background: linear-gradient(90deg, 
+                var(--spu-red) 0%, var(--spu-red) 65%, 
+                var(--spu-navy) 65%, var(--spu-navy) 85%, 
+                var(--spu-orange) 85%, var(--spu-orange) 100%);
+            width: 100%;
+        }
+
+        /* Sidebar Navigation - Red and Deep Navy Dominant */
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, var(--spu-red) 0%, var(--spu-navy-dark) 100%);
+            box-shadow: 4px 0 20px rgba(10, 36, 114, 0.15);
+            z-index: 100;
+        }
+
+        .sidebar .brand-container {
+            border-bottom: 1px solid rgba(245, 240, 230, 0.15);
+        }
+
+        .sidebar .nav-link {
+            color: rgba(245, 240, 230, 0.9);
+            padding: 0.85rem 1.25rem;
+            border-radius: 0.75rem;
+            margin-bottom: 0.35rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar .nav-link:hover {
+            color: #FFFFFF;
+            background: rgba(245, 240, 230, 0.15);
+            transform: translateX(3px);
+        }
+
+        .sidebar .nav-link.active {
+            color: #FFFFFF;
+            background: var(--spu-red-hover);
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(200, 16, 46, 0.4);
+            border-left: 4px solid var(--spu-orange);
+        }
+
+        .sidebar .nav-link i {
+            font-size: 1.2rem;
+            width: 1.75rem;
+        }
+
+        /* Primary and Secondary Buttons */
+        .btn-spu-primary {
+            background-color: var(--spu-red);
+            color: #FFFFFF;
+            border: 1px solid var(--spu-red);
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .btn-spu-primary:hover, .btn-spu-primary:focus {
+            background-color: var(--spu-red-hover);
+            color: #FFFFFF;
+            border-color: var(--spu-red-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(200, 16, 46, 0.35);
+        }
+
+        .btn-spu-secondary {
+            background-color: var(--spu-navy);
+            color: #FFFFFF;
+            border: 1px solid var(--spu-navy);
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .btn-spu-secondary:hover {
+            background-color: var(--spu-navy-dark);
+            color: #FFFFFF;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(10, 36, 114, 0.25);
+        }
+
+        .btn-spu-gold, .btn-spu-accent {
+            background-color: var(--spu-orange);
+            color: var(--spu-navy-dark);
+            border: 1px solid var(--spu-orange);
+            font-weight: 700;
+            transition: all 0.2s ease;
+        }
+        .btn-spu-gold:hover, .btn-spu-accent:hover {
+            background-color: var(--spu-orange-hover);
+            color: var(--spu-navy-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(245, 166, 35, 0.35);
+        }
+
+        .btn-outline-primary {
+            color: var(--spu-red);
+            border-color: var(--spu-red);
+        }
+        .btn-outline-primary:hover {
+            background-color: var(--spu-red);
+            border-color: var(--spu-red);
+            color: #FFFFFF;
+        }
+
+        /* Role Badges */
+        .badge-role-admin {
+            background-color: var(--spu-red);
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+        .badge-role-lecturer {
+            background-color: var(--spu-navy);
+            color: #FFFFFF;
+            border: 1px solid var(--spu-orange);
+        }
+        .badge-role-student {
+            background-color: var(--spu-orange);
+            color: var(--spu-navy-dark);
+            font-weight: 700;
+        }
+
+        /* Cards & Surfaces */
+        .spu-card {
+            background: var(--spu-card-bg);
+            border: 1px solid var(--spu-border);
+            border-radius: 1rem;
+            box-shadow: 0 4px 18px rgba(10, 36, 114, 0.04);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .spu-card:hover {
+            box-shadow: 0 8px 24px rgba(200, 16, 46, 0.08);
+        }
+
+        .spu-stat-icon {
+            width: 3.25rem;
+            height: 3.25rem;
+            border-radius: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .top-navbar {
+            background: var(--spu-card-bg);
+            border-bottom: 1px solid var(--spu-border);
+            box-shadow: 0 2px 8px rgba(10, 36, 114, 0.03);
+        }
+
+        /* Form Inputs Focus and Borders */
+        .form-control, .form-select {
+            border: 1.5px solid var(--spu-border);
+            background-color: #FFFFFF;
+            color: var(--spu-navy);
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--spu-red);
+            box-shadow: 0 0 0 0.25rem rgba(200, 16, 46, 0.15);
+            background-color: #FFFFFF;
+            color: var(--spu-navy);
+        }
+
+        /* Interactive Role Card Styles on Role Selection Page */
+        .role-option-card {
+            border: 2px solid var(--spu-border);
+            border-radius: 1.15rem;
+            padding: 1.75rem 1.25rem;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            background: var(--spu-card-bg);
+            text-align: center;
+            position: relative;
+            user-select: none;
+        }
+        .role-option-card:hover {
+            border-color: var(--spu-red);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 24px rgba(200, 16, 46, 0.12);
+        }
+        .role-option-card.selected {
+            border-color: var(--spu-red);
+            background: var(--spu-red-subtle);
+            box-shadow: 0 0 0 2px var(--spu-red);
+        }
+        .role-option-card.selected .role-check-indicator {
+            display: block !important;
+        }
+
+        /* Password field with toggle */
+        .password-toggle-wrapper {
+            position: relative;
+        }
+        .password-toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--spu-text-muted);
+            cursor: pointer;
+            padding: 4px;
+            z-index: 10;
+        }
+        .password-toggle-btn:hover {
+            color: var(--spu-red);
+        }
+
+        /* Links */
+        a {
+            color: var(--spu-red);
+            transition: color 0.2s ease;
+        }
+        a:hover {
+            color: var(--spu-red-hover);
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="spu-brand-ribbon"></div>
+    {% if user.is_authenticated %}
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar Navigation -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse show px-0 py-4">
+                <div class="px-4 mb-4 brand-container pb-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="rounded-3 bg-warning text-primary d-flex align-items-center justify-content-center fw-bold" style="width: 38px; height: 38px; font-size: 1.2rem; background-color: var(--spu-gold) !important; color: var(--spu-blue) !important;">
+                            <i class="bi bi-buildings"></i>
+                        </div>
+                        <div>
+                            <h5 class="text-white mb-0 fw-bold" style="letter-spacing: -0.5px;">SPU Venues</h5>
+                            <small class="text-white-50" style="font-size: 0.75rem;">Sol Plaatje University</small>
+                        </div>
+                    </div>
+                </div>
+
+                <ul class="nav flex-column px-3">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'dashboard:home' %}">
+                            <i class="bi bi-grid-1x2"></i> Dashboard
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'resources' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'dashboard:resources' %}">
+                            <i class="bi bi-door-open"></i> SPU Venues
+                        </a>
+                    </li>
+
+                    {% if user.role == 'admin' %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'requests' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'dashboard:booking_requests' %}">
+                            <i class="bi bi-clipboard2-check"></i> Booking Requests
+                            {% if pending_booking_count %}
+                            <span class="badge bg-warning text-dark ms-auto fw-bold">{{ pending_booking_count }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'users' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'dashboard:users' %}">
+                            <i class="bi bi-people"></i> Manage Users
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    {% if user.role == 'lecturer' or user.role == 'student_leader' %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if 'booking_reports' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'dashboard:booking_reports' %}">
+                            <i class="bi bi-journal-text"></i> My Bookings
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+
+                <div class="px-4 mt-5 pt-4 text-white-50" style="font-size: 0.78rem;">
+                    <div class="p-3 rounded-3" style="background: rgba(255,255,255,0.06);">
+                        <div class="fw-semibold text-white mb-1"><i class="bi bi-shield-check me-1 text-warning"></i> SPU Portal</div>
+                        <div>Signed in as <strong class="text-white">{{ user.get_role_display }}</strong></div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Main Content Area -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-0">
+                <!-- Top Navbar -->
+                <nav class="navbar navbar-expand-lg top-navbar px-4 py-3">
+                    <div class="container-fluid px-0">
+                        <div class="d-flex align-items-center">
+                            <span class="fw-bold text-muted small text-uppercase" style="letter-spacing: 0.05em;">
+                                Sol Plaatje University &bull; Venue Management Portal
+                            </span>
+                        </div>
+
+                        <div class="ms-auto d-flex align-items-center gap-3">
+                            <div class="text-end d-none d-sm-block">
+                                <div class="fw-bold text-dark">{{ user.full_name }}</div>
+                                <div class="small">
+                                    {% if user.role == 'admin' %}
+                                        <span class="badge badge-role-admin rounded-pill px-2 py-1">Administrator</span>
+                                    {% elif user.role == 'lecturer' %}
+                                        <span class="badge badge-role-lecturer rounded-pill px-2 py-1">Lecturer</span>
+                                    {% else %}
+                                        <span class="badge badge-role-student rounded-pill px-2 py-1">Student Leader</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="dropdown">
+                                <a href="#" class="d-block text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold shadow-sm" style="width:42px; height:42px; background: var(--spu-blue); border: 2px solid var(--spu-gold);">
+                                        {{ user.full_name|slice:":1" }}
+                                    </div>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3 mt-2">
+                                    <li class="px-3 py-2 border-bottom">
+                                        <div class="fw-bold">{{ user.full_name }}</div>
+                                        <div class="text-muted small">{{ user.email }}</div>
+                                    </li>
+                                    <li><a class="dropdown-item py-2" href="{% url 'dashboard:home' %}"><i class="bi bi-grid-1x2 me-2 text-primary"></i> Dashboard</a></li>
+                                    <li><a class="dropdown-item py-2" href="{% url 'dashboard:resources' %}"><i class="bi bi-buildings me-2 text-primary"></i> Browse Venues</a></li>
+                                    <li><hr class="dropdown-divider my-1"></li>
+                                    <li><a class="dropdown-item py-2 text-danger fw-semibold" href="{% url 'dashboard:logout' %}"><i class="bi bi-box-arrow-right me-2"></i> Sign Out</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+
+                <!-- Page Body Content -->
+                <div class="p-4 p-md-5">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show mb-4 border-0 shadow-sm rounded-3" role="alert">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                                    <div>{{ message }}</div>
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% block content %}{% endblock %}
+                </div>
+            </main>
+        </div>
+    </div>
+    {% else %}
+        {% block auth_content %}{% endblock %}
+    {% endif %}
+
+    <!-- Bootstrap Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+

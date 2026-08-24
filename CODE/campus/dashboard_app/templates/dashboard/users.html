@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}Manage SPU Users | Sol Plaatje University{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+        <h1 class="fw-bold mb-1" style="color: var(--spu-navy);">
+            <i class="bi bi-people-fill me-2" style="color: var(--spu-red);"></i>SPU Portal Users by Role
+        </h1>
+        <p class="text-muted mb-0" style="color: var(--spu-text-muted) !important;">System accounts categorized by their assigned university role.</p>
+    </div>
+</div>
+
+<div class="card spu-card mb-4 border-0">
+    <div class="card-body p-4">
+        <form method="get" class="row g-3">
+            <div class="col-md-5">
+                <label class="form-label small fw-semibold" style="color: var(--spu-navy);">Search User</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0" style="border-color: var(--spu-border); color: var(--spu-navy);"><i class="bi bi-search"></i></span>
+                    <input class="form-control border-start-0" name="search" value="{{ search|default:'' }}" placeholder="Search name, email, student/staff ID...">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label small fw-semibold" style="color: var(--spu-navy);">Filter Role</label>
+                <select class="form-select" name="role" id="role-filter">
+                    <option value="">All Roles</option>
+                    <option value="student_leader" {% if role_filter == 'student_leader' %}selected{% endif %}>Student Leaders</option>
+                    <option value="lecturer" {% if role_filter == 'lecturer' %}selected{% endif %}>Lecturers / Staff</option>
+                    <option value="admin" {% if role_filter == 'admin' %}selected{% endif %}>Administrators</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end gap-2">
+                <button type="submit" class="btn btn-spu-primary rounded-3 w-100"><i class="bi bi-funnel me-1"></i> Filter</button>
+                <a href="{% url 'dashboard:users' %}" class="btn btn-light border rounded-3" style="border-color: var(--spu-border) !important; color: var(--spu-navy);"><i class="bi bi-arrow-counterclockwise"></i></a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row g-4">
+    {% for role_name, role_users in role_groups %}
+    <div class="col-lg-4">
+        <div class="card spu-card h-100 overflow-hidden border-0">
+            <div class="p-3 border-bottom d-flex justify-content-between align-items-center" style="background: var(--spu-card-bg); border-color: var(--spu-border) !important;">
+                <h5 class="mb-0 fw-bold" style="color: var(--spu-navy);">{{ role_name }}</h5>
+                <span class="badge rounded-pill fw-bold" style="background: var(--spu-red); color: #FFFFFF;">{{ role_users.count }}</span>
+            </div>
+            <div class="list-group list-group-flush">
+                {% for account in role_users %}
+                <div class="list-group-item p-3 border-bottom d-flex justify-content-between align-items-center" style="background: transparent; border-color: var(--spu-border) !important;">
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            <strong style="color: var(--spu-navy);">{{ account.full_name }}</strong>
+                            {% if account.id == user.id %}
+                            <span class="badge rounded-pill small" style="background: var(--spu-navy-subtle); color: var(--spu-navy); font-size:0.65rem;">You</span>
+                            {% endif %}
+                        </div>
+                        <div class="text-muted small" style="color: var(--spu-text-muted) !important;">{{ account.email }}</div>
+                        {% if account.leadership_role %}
+                        <span class="badge rounded-pill small mt-1" style="background: var(--spu-orange-subtle); color: var(--spu-orange-hover); border: 1px solid var(--spu-orange);">
+                            {{ account.get_leadership_role_display }}
+                        </span>
+                        {% endif %}
+                        {% if account.student_number %}
+                        <small class="text-muted d-block" style="color: var(--spu-text-muted) !important;">ID: {{ account.student_number }}</small>
+                        {% endif %}
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-light border rounded-2" style="border-color: var(--spu-border) !important; color: var(--spu-navy);" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
+                            <li><a class="dropdown-item small py-2" href="{% url 'dashboard:users_edit' account.id %}"><i class="bi bi-pencil me-2" style="color: var(--spu-red);"></i> Edit Account</a></li>
+                            {% if account.id != user.id and account.role != 'admin' %}
+                            <li><a class="dropdown-item small py-2 text-danger" href="{% url 'dashboard:users_delete' account.id %}" onclick="return confirm('Delete this user?');"><i class="bi bi-trash me-2"></i> Delete</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="list-group-item text-muted text-center py-4" style="background: transparent;">No users in this role.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+

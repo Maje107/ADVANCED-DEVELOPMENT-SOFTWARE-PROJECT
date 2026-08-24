@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}{% if mode == 'create' %}Create SPU User{% else %}Edit SPU User{% endif %} | Sol Plaatje University{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <a href="{% url 'dashboard:users' %}" class="text-decoration-none d-inline-flex align-items-center mb-3 fw-semibold" style="color: var(--spu-navy);">
+        <i class="bi bi-arrow-left me-2" style="color: var(--spu-red);"></i> Back to Users
+    </a>
+    <h1 class="fw-bold mb-1" style="color: var(--spu-navy);">
+        {% if mode == 'create' %}
+            <i class="bi bi-person-plus me-2" style="color: var(--spu-red);"></i>Create New User
+        {% else %}
+            <i class="bi bi-pencil-square me-2" style="color: var(--spu-red);"></i>Edit User: {{ user.full_name }}
+        {% endif %}
+    </h1>
+    <p class="text-muted mb-0" style="color: var(--spu-text-muted) !important;">Manage account information, role designations, and access credentials.</p>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card spu-card overflow-hidden border-0">
+            <div class="spu-brand-ribbon"></div>
+            <div class="card-body p-4 p-md-5" style="background: var(--spu-card-bg);">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="row g-4">
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold small" style="color: var(--spu-navy);">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" name="full_name" class="form-control rounded-3 py-2" placeholder="John Doe"
+                                value="{% if mode == 'edit' %}{{ user.full_name }}{% endif %}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small" style="color: var(--spu-navy);">Role <span class="text-danger">*</span></label>
+                            <select name="role" class="form-select rounded-3 py-2">
+                                <option value="student_leader" {% if mode == 'create' or user.role == 'student_leader' %}selected{% endif %}>Student Leader</option>
+                                <option value="lecturer" {% if mode == 'edit' and user.role == 'lecturer' %}selected{% endif %}>Lecturer</option>
+                                <option value="admin" {% if mode == 'edit' and user.role == 'admin' %}selected{% endif %}>Administrator</option>
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold small" style="color: var(--spu-navy);">Email Address <span class="text-danger">*</span></label>
+                            <input type="email" name="email" class="form-control rounded-3 py-2" placeholder="john@spu.ac.za"
+                                value="{% if mode == 'edit' %}{{ user.email }}{% endif %}" {% if mode == 'edit' %}disabled{% endif %} required>
+                            {% if mode == 'edit' %}<small class="text-muted">Email address cannot be changed.</small>{% endif %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small" style="color: var(--spu-navy);">Student Number</label>
+                            <input type="text" name="student_number" class="form-control rounded-3 py-2" placeholder="20230001"
+                                value="{% if mode == 'edit' %}{{ user.student_number|default:'' }}{% endif %}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small" style="color: var(--spu-navy);">
+                                Password
+                                {% if mode == 'create' %}<span class="text-danger">*</span>{% endif %}
+                            </label>
+                            <input type="password" name="password" class="form-control rounded-3 py-2" placeholder="{% if mode == 'create' %}Minimum 8 characters{% else %}Leave blank to keep unchanged{% endif %}"
+                                {% if mode == 'create' %}required{% endif %}>
+                            {% if mode == 'edit' %}<small class="text-muted">Only enter a value if you wish to reset their password.</small>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small" style="color: var(--spu-navy);">Contact Phone</label>
+                            <input type="tel" name="phone_number" class="form-control rounded-3 py-2" placeholder="+27 82 123 4567"
+                                value="{% if mode == 'edit' %}{{ user.phone_number|default:'' }}{% endif %}">
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-3 justify-content-end pt-4 mt-4 border-top" style="border-color: var(--spu-border) !important;">
+                        <a href="{% url 'dashboard:users' %}" class="btn btn-light border rounded-3 px-4" style="border-color: var(--spu-border) !important; color: var(--spu-navy);">Cancel</a>
+                        <button type="submit" class="btn btn-spu-primary rounded-3 px-5 fw-semibold shadow-sm">
+                            <i class="bi bi-check2-circle me-1"></i>
+                            {% if mode == 'create' %}Create User{% else %}Save Changes{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

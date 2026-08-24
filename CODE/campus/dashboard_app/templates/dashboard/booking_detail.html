@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Booking #{{ booking.id }} Details | Sol Plaatje University{% endblock %}
+
+{% block content %}
+<div class="mb-4">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+        <a href="{% if user.role == 'admin' %}{% url 'dashboard:booking_requests' %}{% else %}{% url 'dashboard:booking_reports' %}{% endif %}" class="text-decoration-none d-inline-flex align-items-center fw-semibold" style="color: var(--spu-navy);">
+            <i class="bi bi-arrow-left me-2" style="color: var(--spu-red);"></i> Back to {% if user.role == 'admin' %}Requests Queue{% else %}My Bookings{% endif %}
+        </a>
+        <span class="badge rounded-pill px-3 py-2 fw-bold" style="{% if booking.status == 'approved' %}background: var(--spu-navy-subtle); color: var(--spu-navy); border: 1px solid var(--spu-navy);{% elif booking.status == 'declined' %}background: var(--spu-red-subtle); color: var(--spu-red); border: 1px solid var(--spu-red);{% elif booking.status == 'cancelled' %}background: #FFFFFF; color: var(--spu-text-muted); border: 1px solid var(--spu-border);{% else %}background: var(--spu-orange-subtle); color: var(--spu-orange-hover); border: 1px solid var(--spu-orange);{% endif %}">
+            <i class="bi {% if booking.status == 'approved' %}bi-check-circle-fill{% elif booking.status == 'declined' %}bi-x-circle-fill{% elif booking.status == 'cancelled' %}bi-slash-circle{% else %}bi-hourglass-split{% endif %} me-1"></i>
+            {{ booking.get_status_display }}
+        </span>
+    </div>
+    <h1 class="fw-bold mb-1" style="color: var(--spu-navy);">
+        Booking Record #{{ booking.id }}
+    </h1>
+    <p class="text-muted mb-0" style="color: var(--spu-text-muted) !important;">Complete details and audit trail for venue reservation reference SPU-BK-{{ booking.id }}.</p>
+</div>
+
+<div class="row g-4 justify-content-center">
+    <div class="col-lg-8">
+        <div class="card spu-card overflow-hidden border-0">
+            <div class="spu-brand-ribbon"></div>
+            <div class="card-body p-4 p-md-5" style="background: var(--spu-card-bg);">
+                <!-- Venue Section -->
+                <div class="p-3 rounded-3 border mb-4" style="background: #FFFFFF; border-color: var(--spu-border) !important;">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <span class="badge rounded-pill px-2 py-1 mb-1 fw-bold" style="background: var(--spu-red); color: #FFFFFF;">
+                                {{ booking.resource.venue_type }}
+                            </span>
+                            <h4 class="fw-bold mb-1" style="color: var(--spu-navy);">{{ booking.resource.name }}</h4>
+                            <div class="text-muted small">
+                                <i class="bi bi-geo-alt-fill me-1" style="color: var(--spu-red);"></i>{{ booking.resource.building.name|default:'Main Campus' }} &bull; Room {{ booking.resource.room_number|default:'—' }}
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <span class="text-muted small d-block">Capacity</span>
+                            <strong style="color: var(--spu-navy);">{{ booking.resource.capacity|default:'—' }} seats</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Schedule Section -->
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6">
+                        <div class="p-3 border rounded-3 h-100" style="background: #FFFFFF; border-color: var(--spu-border) !important;">
+                            <span class="text-muted small d-block mb-1"><i class="bi bi-calendar3 me-1" style="color: var(--spu-red);"></i> Reservation Date</span>
+                            <h5 class="fw-bold mb-0" style="color: var(--spu-navy);">{{ booking.booking_date|date:"l, d F Y" }}</h5>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="p-3 border rounded-3 h-100" style="background: #FFFFFF; border-color: var(--spu-border) !important;">
+                            <span class="text-muted small d-block mb-1"><i class="bi bi-clock me-1" style="color: var(--spu-orange);"></i> Time Interval</span>
+                            <h5 class="fw-bold mb-0" style="color: var(--spu-navy);">{{ booking.start_time|time:"H:i" }} – {{ booking.end_time|time:"H:i" }}</h5>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Booking Purpose -->
+                <div class="mb-4">
+                    <label class="form-label fw-bold small" style="color: var(--spu-navy);">Booking Purpose & Activity Details</label>
+                    <div class="p-3 rounded-3 border" style="background: #FFFFFF; border-color: var(--spu-border) !important;">
+                        <p class="mb-0" style="white-space: pre-line; color: var(--spu-text-body);">{{ booking.purpose }}</p>
+                    </div>
+                </div>
+
+                <!-- Requestor Details -->
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6">
+                        <label class="form-label fw-bold small" style="color: var(--spu-navy);">Submitted By</label>
+                        <div class="p-3 border rounded-3" style="background: #FFFFFF; border-color: var(--spu-border) !important;">
+                            <div class="fw-bold" style="color: var(--spu-navy);">{{ booking.requested_by.full_name }}</div>
+                            <div class="text-muted small">{{ booking.requested_by.email }}</div>
+                            <span class="badge {% if booking.requested_by.role == 'admin' %}badge-role-admin{% elif booking.requested_by.role == 'lecturer' %}badge-role-lecturer{% else %}badge-role-student{% endif %} rounded-pill small mt-1">
+                                {{ booking.requested_by.get_role_display }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="form-label fw-bold small" style="color: var(--spu-navy);">Contact & Timestamps</label>
+                        <div class="p-3 border rounded-3" style="background: #FFFFFF; border-color: var(--spu-border) !important;">
+                            <div class="small text-muted mb-1"><i class="bi bi-telephone me-1" style="color: var(--spu-navy);"></i> <strong>{{ booking.phone_number }}</strong></div>
+                            <div class="small text-muted"><i class="bi bi-clock-history me-1" style="color: var(--spu-navy);"></i> Submitted: {{ booking.created_at|date:"d M Y, H:i" }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status Update / Action for Admin -->
+                {% if user.role == 'admin' %}
+                <div class="p-4 rounded-3 border mt-4" style="background: var(--spu-navy-subtle); border-color: var(--spu-border) !important;">
+                    <h6 class="fw-bold mb-3" style="color: var(--spu-navy);"><i class="bi bi-shield-check me-2" style="color: var(--spu-red);"></i> Administrative Decision</h6>
+                    <form method="post" action="{% url 'dashboard:booking_update_status' booking.id %}" class="d-flex gap-2 flex-wrap">
+                        {% csrf_token %}
+                        <button type="submit" name="status" value="approved" class="btn btn-spu-primary px-4 rounded-3 fw-semibold shadow-sm" {% if booking.status == 'approved' %}disabled{% endif %}>
+                            <i class="bi bi-check-lg me-1"></i> Approve Reservation
+                        </button>
+                        <button type="submit" name="status" value="declined" class="btn btn-outline-danger px-4 rounded-3 fw-semibold" {% if booking.status == 'declined' %}disabled{% endif %}>
+                            <i class="bi bi-x-lg me-1"></i> Decline Request
+                        </button>
+                        <button type="submit" name="status" value="cancelled" class="btn btn-light border px-3 rounded-3" style="border-color: var(--spu-border) !important; color: var(--spu-navy);" {% if booking.status == 'cancelled' %}disabled{% endif %}>
+                            Mark Cancelled
+                        </button>
+                    </form>
+                </div>
+                {% elif booking.requested_by == user and booking.status != 'cancelled' %}
+                <div class="d-flex justify-content-end pt-3 border-top" style="border-color: var(--spu-border) !important;">
+                    <form method="post" action="{% url 'dashboard:booking_cancel' booking.id %}" onsubmit="return confirm('Cancel this reservation?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger rounded-3 px-4">
+                            <i class="bi bi-slash-circle me-1"></i> Cancel Reservation
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
